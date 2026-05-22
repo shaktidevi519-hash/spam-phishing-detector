@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing & Spam Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>SMS Spam & Phishing Detector</h1>
+            <p class="subtitle">Enter any message below to screen it with our hybrid Machine Learning & heuristic security filter.</p>
+        </header>
+
+        <main>
+            <form action="/" method="POST">
+                <label for="message">Analyze Incoming Message</label>
+                <textarea 
+                    name="message" 
+                    id="message" 
+                    placeholder="Paste email context, banking alerts, or text messages here..." 
+                    required>{{ previous_text }}</textarea>
+                
+                <button type="submit">Scan Message</button>
+            </form>
+
+            {% if result %}
+                <div class="result-card {{ status }}">
+                    <h2>{{ result }}</h2>
+                    
+                    {% if keywords %}
+                        <div class="keyword-box">
+                            <p><strong>Triggered Suspicious Keywords:</strong></p>
+                            <ul>
+                                {% for word in keywords %}
+                                    <li>• {{ word }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </main>
+    </div>
+
+</body>
+</html>
