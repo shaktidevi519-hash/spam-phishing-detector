@@ -1,250 +1,422 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Phishing & Spam Detector</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Modern Reset & Base Styling */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMS Spam & Phishing Detector</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            background: radial-gradient(circle at 50% 50%, #1a1c24 0%, #0f1015 100%);
-            color: #f3f4f6;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    :root {
+      --yellow:       #f5c518;
+      --yellow-dim:   #c9a10e;
+      --yellow-glow:  rgba(245, 197, 24, 0.12);
+      --yellow-border:rgba(245, 197, 24, 0.22);
+      --bg:           #080807;
+      --surface:      #0f0f0c;
+      --surface2:     #141410;
+      --border:       #1c1c16;
+      --border2:      #252518;
+      --text:         #e8e0c4;
+      --muted:        #3e3c2c;
+      --muted2:       #5a5640;
+      --green:        #22c77a;
+      --green-bg:     rgba(34,199,122,0.08);
+      --green-border: rgba(34,199,122,0.2);
+      --danger-bg:    rgba(245,197,24,0.05);
+      --danger-border:rgba(245,197,24,0.18);
+    }
 
-        /* Glassmorphism Container Card */
-        .app-container {
-            background: rgba(30, 33, 45, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(16px);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 650px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
 
-        header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #3b82f6, #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border2);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 580px;
+      padding: 36px 34px 32px;
+    }
 
-        header .subtitle {
-            font-size: 0.95rem;
-            color: #9ca3af;
-            line-height: 1.5;
-            margin-bottom: 30px;
-        }
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 6px;
+    }
 
-        /* Interactive Form Layout */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+    .icon-box {
+      width: 38px; height: 38px;
+      background: var(--yellow);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
 
-        form label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #9ca3af;
-        }
+    .icon-box svg { width: 20px; height: 20px; }
 
-        form textarea {
-            background: rgba(15, 16, 21, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 16px;
-            color: #ffffff;
-            font-size: 1rem;
-            resize: none;
-            height: 140px;
-            transition: all 0.3s ease;
-        }
+    h1 {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--yellow);
+      letter-spacing: -0.3px;
+    }
 
-        form textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted2);
+      margin-left: 51px;
+      margin-bottom: 28px;
+      line-height: 1.55;
+    }
 
-        form button {
-            background: #3b82f6;
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: 600;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
+    hr {
+      border: none;
+      border-top: 0.5px solid var(--border2);
+      margin-bottom: 24px;
+    }
 
-        form button:hover {
-            background: #2563eb;
-        }
+    /* ── Form ── */
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+      color: var(--muted2);
+      margin-bottom: 10px;
+    }
 
-        /* Conditional Evaluation Alert Cards */
-        .result-card {
-            margin-top: 30px;
-            padding: 24px;
-            border-radius: 10px;
-            display: none; /* Hidden by default */
-        }
+    textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 0.5px solid var(--border2);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      height: 130px;
+      line-height: 1.65;
+      transition: border-color 0.2s, background 0.2s;
+    }
 
-        .result-card h2 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
+    textarea::placeholder { color: var(--muted); }
 
-        /* Success Card Style */
-        .result-card.success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #10b981;
-            display: block;
-        }
+    textarea:focus {
+      outline: none;
+      border-color: var(--yellow);
+      background: #0c0c09;
+      box-shadow: 0 0 0 3px rgba(245,197,24,0.08);
+    }
 
-        /* Phishing Threat Style */
-        .result-card.danger {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-            display: block;
-        }
+    .btn-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 13px;
+    }
 
-        .keyword-box {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f3f4f6;
-        }
+    .btn-scan {
+      background: var(--yellow);
+      color: #080807;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 11px 22px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      letter-spacing: 0.1px;
+      transition: background 0.15s, transform 0.1s;
+    }
 
-        .keyword-box p {
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
+    .btn-scan:hover  { background: var(--yellow-dim); }
+    .btn-scan:active { transform: scale(0.97); }
 
-        .keyword-box ul {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
+    .btn-scan svg { width: 16px; height: 16px; }
 
-        .keyword-box li {
-            background: rgba(239, 68, 68, 0.15);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #fca5a5;
-        }
-    </style>
+    .btn-clear {
+      background: transparent;
+      color: var(--muted2);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 11px 16px;
+      border: 0.5px solid var(--border2);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .btn-clear:hover {
+      background: var(--surface2);
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    .char-count {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Result card ── */
+    .result {
+      margin-top: 22px;
+      border-radius: 9px;
+      padding: 20px;
+      display: none;
+      animation: rise 0.22s ease;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(7px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result.danger {
+      display: block;
+      background: var(--danger-bg);
+      border: 0.5px solid var(--danger-border);
+    }
+
+    .result.safe {
+      display: block;
+      background: var(--green-bg);
+      border: 0.5px solid var(--green-border);
+    }
+
+    .res-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      padding: 3px 10px;
+      border-radius: 5px;
+    }
+
+    .badge.danger {
+      background: var(--yellow-glow);
+      color: var(--yellow);
+      border: 0.5px solid var(--yellow-border);
+    }
+
+    .badge.safe {
+      background: rgba(34,199,122,0.1);
+      color: var(--green);
+      border: 0.5px solid var(--green-border);
+    }
+
+    .res-title        { font-size: 14px; font-weight: 500; }
+    .res-title.danger { color: var(--yellow); }
+    .res-title.safe   { color: var(--green); }
+
+    /* Score row */
+    .scores {
+      display: flex;
+      gap: 9px;
+      margin-bottom: 14px;
+    }
+
+    .sc {
+      flex: 1;
+      background: rgba(255,255,255,0.02);
+      border: 0.5px solid var(--border2);
+      border-radius: 7px;
+      padding: 10px 13px;
+    }
+
+    .sc-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--muted2);
+      margin-bottom: 4px;
+    }
+
+    .sc-val            { font-size: 22px; font-weight: 600; }
+    .sc-val.yellow     { color: var(--yellow); }
+    .sc-val.yellow-dim { color: #c9a10e; }
+    .sc-val.green      { color: var(--green); }
+
+    .res-body {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .kw-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted2);
+      margin-bottom: 8px;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .tag {
+      background: rgba(245,197,24,0.07);
+      border: 0.5px solid rgba(245,197,24,0.2);
+      color: #a88e20;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 5px;
+      font-family: 'SF Mono', 'Fira Mono', 'Courier New', monospace;
+    }
+
+    .url-warn {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #8a7010;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .url-warn svg { width: 14px; height: 14px; flex-shrink: 0; }
+  </style>
 </head>
 <body>
+  <div class="card">
 
-    <div class="app-container">
-        <header>
-            <h1>SMS Spam & Phishing Detector</h1>
-            <p class="subtitle">Enter any message below to screen it with our hybrid intelligence security filter.</p>
-        </header>
-
-        <main>
-            <form id="spamForm" onsubmit="analyzeMessage(event)">
-                <label for="message">Analyze Incoming Message</label>
-                <textarea 
-                    id="message" 
-                    placeholder="Paste email context, banking alerts, or text messages here..." 
-                    required></textarea>
-                
-                <button type="submit">Scan Message</button>
-            </form>
-
-            <div id="resultCard" class="result-card">
-                <h2 id="resultTitle"></h2>
-                <div id="keywordBox" class="keyword-box" style="display: none;">
-                    <p><strong>Triggered Suspicious Keywords:</strong></p>
-                    <ul id="keywordList"></ul>
-                </div>
-            </div>
-        </main>
+    <div class="header">
+      <div class="icon-box">
+        <!-- Shield icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="#080807" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <polyline points="9 12 11 14 15 10"/>
+        </svg>
+      </div>
+      <h1>Phishing &amp; Spam Detector</h1>
     </div>
 
-    <script>
-        function analyzeMessage(event) {
-            event.preventDefault();
-            
-            const message = document.getElementById('message').value;
-            const resultCard = document.getElementById('resultCard');
-            const resultTitle = document.getElementById('resultTitle');
-            const keywordBox = document.getElementById('keywordBox');
-            const keywordList = document.getElementById('keywordList');
-            
-            // Clear previous states
-            keywordList.innerHTML = '';
-            keywordBox.style.display = 'none';
-            resultCard.className = 'result-card';
-            
-            const phishingKeywords = [
-                "bank", "verify", "otp", "click", "urgent", "login", 
-                "password", "account", "suspended", "winner", "prize", 
-                "lottery", "free", "claim", "cashback", "income", "update", 
-                "verification", "block", "identity", "won", "security", 
-                "alert", "terminated", "compromised"
-            ];
+    <p class="subtitle">Paste any SMS, banking alert, or email to scan for threats.</p>
 
-            const cleanMessage = message.lower ? message.lower() : message.toLowerCase();
-            let detectedWords = [];
+    <hr />
 
-            // Core Heuristics Verification
-            phishingKeywords.forEach(word => {
-                if (cleanMessage.includes(word)) {
-                    detectedWords.push(word);
-                }
-            });
+    <label for="msg">Message input</label>
+    <textarea id="msg" placeholder="Paste your message here..."></textarea>
 
-            // Fallback heuristics to catch standard numeric/spam shortcodes
-            const hasSpamPatterns = (cleanMessage.match(/\b\d{5,6}\b/g) || []).length > 0;
+    <div class="btn-row">
+      <button class="btn-scan" onclick="scan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>
+        </svg>
+        Scan Message
+      </button>
+      <button class="btn-clear" onclick="clearAll()">Clear</button>
+      <span class="char-count" id="cc">0 chars</span>
+    </div>
 
-            if (detectedWords.length > 0 || hasSpamPatterns) {
-                resultTitle.innerText = "⚠️ SPAM / PHISHING DETECTED";
-                resultCard.classList.add('danger');
-                
-                if (detectedWords.length > 0) {
-                    keywordBox.style.display = 'block';
-                    detectedWords.forEach(word => {
-                        const li = document.createElement('li');
-                        li.innerText = `• ${word}`;
-                        keywordList.appendChild(li);
-                    });
-                }
-            } else {
-                resultTitle.innerText = "✅ THIS MESSAGE IS SAFE";
-                resultCard.classList.add('success');
-            }
-        }
-    </script>
+    <div id="result" class="result" role="alert" aria-live="polite"></div>
+
+  </div>
+
+  <script>
+    const KEYWORDS = [
+      "bank","verify","otp","click here","urgent","login","password","account",
+      "suspended","winner","prize","lottery","free","claim","cashback","income",
+      "update","verification","block","identity","won","security","alert",
+      "terminated","compromised","limited time","act now","confirm your",
+      "unusual activity","unauthorized","reset","credential","pin","kyc"
+    ];
+
+    const msgEl = document.getElementById('msg');
+    const ccEl  = document.getElementById('cc');
+
+    msgEl.addEventListener('input', () => {
+      ccEl.textContent = msgEl.value.length + ' chars';
+    });
+
+    function clearAll() {
+      msgEl.value = '';
+      ccEl.textContent = '0 chars';
+      const r = document.getElementById('result');
+      r.className = 'result';
+      r.innerHTML = '';
+    }
+
+    function scan() {
+      const text = msgEl.value.trim();
+      if (!text) { msgEl.focus(); return; }
+
+      const lower  = text.toLowerCase();
+      const found  = KEYWORDS.filter(k => lower.includes(k));
+      const hasNum = /\b\d{5,6}\b/.test(lower);
+      const hasUrl = /https?:\/\/(?![\w-]+\.(gov|ac|edu))[^\s]{0,60}(login|verify|secure|account|update|confirm)/i.test(text);
+      const hasPhone = /\b(call|sms|text|msg)\s*(us|now|back)?\s*(?:on|at|to)?\s*[\d\s\-\+]{8,}/i.test(lower);
+
+      const score   = found.length + (hasNum ? 1 : 0) + (hasUrl ? 2 : 0) + (hasPhone ? 1 : 0);
+      const isPhish = score > 0;
+      const r       = document.getElementById('result');
+
+      r.className = 'result ' + (isPhish ? 'danger' : 'safe');
+
+      if (isPhish) {
+        const level    = score >= 5 ? 'High' : score >= 3 ? 'Medium' : 'Low';
+        const valClass = score >= 5 ? 'yellow' : 'yellow-dim';
+
+        r.innerHTML = `
+          <div class="res-head">
+            <span class="badge danger">Threat Detected</span>
+            <span class="res-title danger">Phishing indicators found</span>
+          </div>
+          <div class="scores">
+            <div class="sc">
+              <div class="sc-label">Threat Signals</div>
+              <div class="sc-val yellow">${score}</div>
+            </div>
+            <div class="sc">
+              <div class="sc-label">Risk Level</div>
+              <div class="sc-val ${valClass}">${level}</div>
+            </div>
+            <div class="sc">
+              <div class="sc-label">Keywords Hit</div>
+              <div class="sc-val yellow">${found.length}</div>
+            </div>
+          </div>
+          <p class="res-body">Do not click any links, call any numbers, or share personal information. Delete this message and block the sender immediately.</p>
+          ${found.length ? `<div class="kw-label">Flagged Keywords</div><div class="tags">${found.map(w => `<span class="tag">${w}</span>`).join('')}</div>` : ''}
+          ${hasUrl ? `<div class="url-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Suspicious URL pattern detected in message</div>` : ''}
+        `;
+      } else {
+        r.innerHTML = `
+          <div class="res-head">
+            <span class="badge safe">No Threats Found</span>
+            <span class="res-title safe">Message appears safe</span>
+          </div>
+          <p class="res-body">No phishing keywords, suspicious URLs, or known spam patterns were detected. Always verify the sender independently if anything feels off.</p>
+        `;
+      }
+    }
+  </script>
 </body>
 </html>
